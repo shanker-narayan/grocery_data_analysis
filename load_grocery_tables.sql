@@ -64,7 +64,7 @@ CREATE TABLE sales(
     FOREIGN KEY(customer_id) REFERENCES customers(customer_id),
     FOREIGN KEY(product_id) REFERENCES products(product_id));
 
--- Had to load in data via the terminal b/c Workbench doesn't support MySQL Server 8.3, could not enable LOCAL INFILE. See 'guide' for step-by-step.
+-- Had to load in data via the terminal b/c Workbench doesn't support MySQL Server 8.3, could not enable LOCAL INFILE. See 'README.md' for steps.
 
 SELECT * FROM countries LIMIT 5;
 SELECT * FROM categories LIMIT 5;
