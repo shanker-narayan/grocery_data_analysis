@@ -25,4 +25,18 @@ LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
 (sales_id, salesperson_id, customer_id, product_id, quantity, discount, total_price, sales_date, transaction_number);
       
+**"Order" Definition & Data Structure Notes**
 
+This dataset does not contain an order_id field.
+After inspecting the sales table, I confirmed that each record represents a single transaction rather than a line-item within a multi-product order.
+
+Evidence for this:
+
+Each sales_id value is unique and appears only once.
+
+When multiple purchases occur on the same day for the same customer, the timestamps are several hours apart — not seconds or minutes apart, which would indicate multiple items inside one order.
+
+There is no grouping variable (e.g., order number, basket ID, receipt ID) that links multiple products together.
+
+Therefore, for all spending analyses in this project, I treat each row in sales as one distinct order.
+Order-level revenue is computed using:
