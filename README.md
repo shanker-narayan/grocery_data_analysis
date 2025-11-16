@@ -24,8 +24,11 @@ LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
 (sales_id, salesperson_id, customer_id, product_id, quantity, discount, total_price, sales_date, transaction_number);
 
+
+
+
       
-**--- Calculating spending bins: definining "orders" and other data structure notes**
+**----------Calculating spending bins: definining "orders" and other data structure notes----------**
 
 This dataset does not contain an order_id field.
 After inspecting the sales table, I confirmed that each record represents a single transaction rather than a line-item within a multi-product order.
