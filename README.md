@@ -32,11 +32,11 @@ After inspecting the sales table, I confirmed that each record represents a sing
 
 Evidence for this:
 
-Each sales_id value is unique and appears only once.
+- Each sales_id value is unique and appears only once.
 
-When multiple purchases occur on the same day for the same customer, the timestamps are several hours apart — not seconds or minutes apart, which would indicate multiple items inside one order.
+- When multiple purchases occur on the same day for the same customer, the timestamps are several hours apart — not seconds or minutes apart, which would indicate multiple items inside one order.
 
-There is no grouping variable (e.g., order number, basket ID, receipt ID) that links multiple products together.
+- There is no grouping variable (e.g., order number, basket ID, receipt ID) that links multiple products together.
 
 Therefore, for all spending analyses in this project, I treat each row in sales as one distinct order.
-Order-level revenue is computed using:
+Order-level revenue is computed using: **quantity** (from sales.csv) * **price** (from products.csv)
