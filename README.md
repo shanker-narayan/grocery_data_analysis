@@ -6,12 +6,16 @@ A relational database project built in MySQL, including schema design, large-sca
 When importing large CSVs into MySQL Server 8.3, the Workbench data-import wizard may fail because recent MySQL Server versions are not fully supported by Workbench. If the import appears to hang or doesn’t complete, use the MySQL CLI with LOAD DATA INFILE. Refer to the code below for loading CSV's using CLI
 
 **-Open Terminal**
+
 **-Establish MySQL Connection**: 
 mysql -u root -p --local-infile=1.
+
 **-Select database**: 
 USE grocery_store;
+
 **-Execute this line**: 
 SET GLOBAL local_infile = 1;
+
 **-Load csv data into tables (example with sales.csv below)**
 LOAD DATA LOCAL INFILE (file/path/Documents/Grocery_Store_Database/sales.csv)
 FIELDS TERMINATED BY ','
