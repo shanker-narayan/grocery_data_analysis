@@ -45,6 +45,7 @@ Therefore, for all spending analyses in this project, I treat each row in sales 
 Order-level revenue is computed using: **quantity** (from sales.csv) * **price** (from products.csv)
 
 **---------- Interpreting Rank Divergence ----------**
+
 To understand how cities differ in their purchasing behavior, I compared two metrics:
 
 sales_rank: a city’s position based on the total number of orders
