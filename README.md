@@ -43,3 +43,20 @@ Evidence for this:
 
 Therefore, for all spending analyses in this project, I treat each row in sales as one distinct order.
 Order-level revenue is computed using: **quantity** (from sales.csv) * **price** (from products.csv)
+
+**---------- Interpreting Rank Divergence ----------**
+To understand how cities differ in their purchasing behavior, I compared two metrics:
+
+sales_rank: a city’s position based on the total number of orders
+
+rev_rank: a city’s position based on total revenue
+
+rank_diff = sales_rank - rev_rank
+
+Since a rank of 1 is best, the difference between these ranks reveals whether a city’s orders are generally high value or low value relative to how many are placed.
+
+Cities like Richmond, Portland, and Tulsa had the highest negative rank_diff, meaning their revenue is underperforming relative to sales. This tells me that there could be lots of transactions in these cities, but that they tend to be smaller and cheaper on average.
+
+Cities like Lubbock, Jacksonville, and Arlington had the highest positive rank_diff, showing that revenue outperformed number of sales in these regions. This tells me that there are fewer transactions, but that they may be larger or more expensive on average.
+
+Cities like Tucson, Indianapolis, Akron, Newark, and Colorado had matching sales and revenue ranks, meaning that revenue was aligned with their sales volume. 
