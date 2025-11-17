@@ -1,63 +1,137 @@
-# grocery_data_analysis
-A relational database project built in MySQL, including schema design, large-scale CSV imports, and SQL queries for exploratory data analysis.
+**Grocery Store SQL Analysis**
 
-**----------Loading CSV data into tables----------**
-  
-When importing large CSVs into MySQL Server 8.3, the Workbench data-import wizard may fail because recent MySQL Server versions are not fully supported by Workbench. If the import appears to hang or doesn’t complete, use the MySQL CLI with LOAD DATA INFILE. Refer to the code below for loading CSV's using CLI
+I used MySQL to analyze a synthetic grocery store database that I downloaded from Kaggle. I explored revenue drivers across different markets, city-level performance patterns, and customer behavior dynamics. This project demonstrates my ability to work with large relational datasets and write production-quality SQL.
 
-**-Open Terminal**
+**Skills Demonstrated**
 
-**-Establish MySQL Connection**: 
-mysql -u root -p --local-infile=1.
+1. SQL (MySQL): CTEs, window functions, views, case statements, grouping, indexing
 
-**-Select database**: 
-USE grocery_store;
+2. Data schema understanding across multi-table retail data
 
-**-Execute this line**: 
-SET GLOBAL local_infile = 1;
+3. Exploratory data analysis: revenue drivers, customer behavior, city performance
 
-**-Load csv data into tables (example with sales.csv below)**
-LOAD DATA LOCAL INFILE (file/path/Documents/Grocery_Store_Database/sales.csv)
-FIELDS TERMINATED BY ','
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS
-(sales_id, salesperson_id, customer_id, product_id, quantity, discount, total_price, sales_date, transaction_number);
+4. Narrative data storytelling: identifying patterns, examining the “why” behind the numbers
 
+5. Business insight generation: connecting SQL findings to real-world implications
 
+**Project Overview**
 
+Goal: develop a framework to understand what drives sales and revenue across cities, and identify why certain markets outperform others.
 
-      
-**----------Calculating spending bins: definining "orders" and other data structure notes----------**
+All SQL queries used in this project can be found in:
+grocery_store_EDA.sql and load_grocery_tables.sql
 
-This dataset does not contain an order_id field.
-After inspecting the sales table, I confirmed that each record represents a single transaction rather than a line-item within a multi-product order.
+NOTE: If you are unable to load the CSV data into your tables via MySQL Workbench, use MySQL CLI and LOCAL INFILE command.
 
-Evidence for this:
+**Dataset & Schema**
 
-- Each sales_id value is unique and appears only once.
+The database includes the following core tables:
 
-- When multiple purchases occur on the same day for the same customer, the timestamps are several hours apart — not seconds or minutes apart, which would indicate multiple items inside one order.
+1. customers – demographic and city-level customer info
 
-- There is no grouping variable (e.g., order number, basket ID, receipt ID) that links multiple products together.
+2. cities – 96 cities mapped to customers (customers.city_id)
 
-Therefore, for all spending analyses in this project, I treat each row in sales as one distinct order.
-Order-level revenue is computed using: **quantity** (from sales.csv) * **price** (from products.csv)
+3. products – product attributes including name, price, category_id, and vitality days
 
-**---------- Interpreting Rank Divergence ----------**
+4. categories – product category names
 
-To understand how cities differ in their purchasing behavior, I compared two metrics:
+5. sales – ~18 years of transaction-level data (sales date, discount, quantity, transaction number)
 
-sales_rank: a city’s position based on the total number of orders
+6. employees – information about grocery store employees (not used)
 
-rev_rank: a city’s position based on total revenue
+7. countries - country names and codes
+
+**Key Analytical Questions & Insights**
+
+Below are the three major insights that, together, form the core story of this analysis.
+
+**1️. Understanding Sales vs. Revenue Performance Across Cities**
+
+To compare how cities perform relative to each other, I calculated:
+
+Sales Rank (sales_rank) — ranking cities by number of individual sales
+
+Revenue Rank (rev_rank) — ranking cities by total dollar revenue (SUM(quantity × price))
+
+This was done using a VIEW (city_metrics) containing:
+
+ROW_NUMBER() OVER (ORDER BY num_sales DESC) AS sales_rank,
+ROW_NUMBER() OVER (ORDER BY total_revenue_mil DESC) AS rev_rank
+
+Insight
+
+I wanted to focus on cities that fell within the following three categories
+- The sales rank was significantly higher than their revenue rank (sales_rank > rev_rank)
+- The revenue rank was significantly higher than the sales rank (sales_rank < rev_rank)
+- The sales rank and revenue rank were exacly the same (sales_rank = rev_rank)
+
+A city that I inspected further was Tucson, which ranked #1 for both number of sales and total revenue.
+
+**Tucson: Why It Dominates Both Sales and Revenue**
+
+To understand why Tucson showed up at #1 across both metrics, I tested three hypotheses:
+
+Hypothesis A → Are Tucson customers buying more expensive products?
+
+→ No. Tucson’s average product price is middle of the pack (Range: $50–$52).
+
+Hypothesis B → Are they buying higher quantities per order?
+
+→ No. Average quantity is consistent across all cities (Range: 12–14 units).
+
+Hypothesis C → Does Tucson simply have more customers?
+
+→ Yes — Tucson also ranked #1 for number of customers in this dataset (Range: 952 - 1104)
+
+Tucson has the highest customer count of all 96 cities, which directly explains its top rankings. This illustrates how a strong customer-base can explain revenue dominance — even when pricing and order habits are identical to peers.
+
+**Rank Divergence Analysis: Which Cities Overperform or Underperform Expectations?**
+
+Using the difference between revenue rank and sales rank:
 
 rank_diff = sales_rank - rev_rank
 
-Since a rank of 1 is best, the difference between these ranks reveals whether a city’s orders are generally high value or low value relative to how many are placed.
 
-Cities like Richmond, Portland, and Tulsa had the highest negative rank_diff, meaning their revenue is underperforming relative to sales. This tells me that there could be lots of transactions in these cities, but that they tend to be smaller and cheaper on average.
+I was able to identify:
 
-Cities like Lubbock, Jacksonville, and Arlington had the highest positive rank_diff, showing that revenue outperformed number of sales in these regions. This tells me that there are fewer transactions, but that they may be larger or more expensive on average.
+1. Cities where revenue underperforms relative to sales: **Richmond, Portland, Tulsa**
 
-Cities like Tucson, Indianapolis, Akron, Newark, and Colorado had matching sales and revenue ranks, meaning that revenue was aligned with their sales volume. 
+These cities generate many orders, but lower-than-expected revenue, suggesting:
+
+cheaper product mixes, smaller order sizes, customer base skewed toward lower-value items.
+
+2. Cities where revenue overperforms relative to sales: **Lubbock, Jacksonville, Arlington**
+
+These cities produce fewer orders, but higher-than-expected revenue, suggesting:
+
+pricier product categories dominate, customers buy higher quantities
+
+3. High-Level Insight
+
+Rank divergence reveals hidden performance patterns that raw sales counts miss — allowing businesses to identify cities that punch above or below their weight.
+
+**How to Reproduce**
+
+1. Clone the repository
+
+2. Import the CSVs into MySQL (through Workbench or CLI)
+
+3. Run the provided SQL scripts in order:
+
+4. load_data.sql
+
+5. grocery_store_EDA.sql
+
+6. Query the city_metrics view and other exploratory queries
+
+**Next Steps**
+
+If I were expanding this analysis, I would explore:
+
+1. Cohort analysis (repeat customers vs. one-time buyers)
+
+2. Time-series revenue trends over 18 years
+
+3. Basket analysis
+
+4. Identifying seasonal or promotional spikes
